@@ -32,9 +32,8 @@ sc = pyspark.SparkContext()
 sqlcontext = SQLContext(sc)
 
 
-glr = GeneralizedLinearRegression(family="gaussian", link="identity", maxIter=10, regParam=0.3)
+glr = GeneralizedLinearRegression(family="gaussian", link="identity", maxIter=10, regParam=0.1)
 pandas_df = pd.read_csv('rank.csv')
-
 pandas_df['split'] = np.random.randn(pandas_df.shape[0], 1)
 
 msk = np.random.rand(len(pandas_df)) <= 0.7
@@ -45,21 +44,20 @@ test = pandas_df[~msk]
 
 s_df = sqlcontext.createDataFrame(train)
 
-
 # In spark.ml all features need to be vectors in a single column, usually named features
 
-trainingData=s_df.rdd.map(lambda x:(Vectors.dense(x[2:]), x[1])).toDF(["features", "label"])
+trainingData=s_df.rdd.map(lambda x:(Vectors.dense(x[2:3]), x[1])).toDF(["features", "label"])
 model = glr.fit(trainingData)
 
 # Print the coefficients and intercept for generalized linear regression model
 print("Coefficients: " + str(model.coefficients))
 print("Intercept: " + str(model.intercept))
 
-#showDetails(model)
+showDetails(model)
 
 test_df = sqlcontext.createDataFrame(test)
 
-testData=test_df.rdd.map(lambda x:(Vectors.dense(x[2:]), x[1])).toDF(["features", "label"])
+testData=test_df.rdd.map(lambda x:(Vectors.dense(x[2:3]), x[1])).toDF(["features", "label"])
 predictions = model.transform(testData)
 
 # # Select example rows to display.

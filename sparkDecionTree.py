@@ -30,7 +30,7 @@ test = pandas_df[~msk]
 s_df = sqlcontext.createDataFrame(train)
 
 
-trainingData=s_df.rdd.map(lambda x:(Vectors.dense(x[2:]), x[1])).toDF(["features", "label"])
+trainingData=s_df.rdd.map(lambda x:(Vectors.dense(x[2:3]), x[1])).toDF(["features", "label"])
 
 featureIndexer = VectorIndexer(inputCol="features", outputCol="indexedFeatures", maxCategories=4).fit(trainingData)
 
@@ -42,7 +42,7 @@ model = pipeline.fit(trainingData)
 
 
 test_df = sqlcontext.createDataFrame(test)
-testData=test_df.rdd.map(lambda x:(Vectors.dense(x[2:]), x[1])).toDF(["features", "label"])
+testData=test_df.rdd.map(lambda x:(Vectors.dense(x[2:3]), x[1])).toDF(["features", "label"])
 predictions = model.transform(testData)
 
 predictions.select("prediction", "label", "features").show(5)
