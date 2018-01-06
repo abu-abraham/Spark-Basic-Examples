@@ -19,6 +19,8 @@ sqlcontext = SQLContext(sc)
 
 pandas_df = pd.read_csv('rank.csv')
 
+(trainingData, testData) = pandas_df.randomSplit([0.7, 0.3])
+
 pandas_df['split'] = np.random.randn(pandas_df.shape[0], 1)
 
 msk = np.random.rand(len(pandas_df)) <= 0.7
